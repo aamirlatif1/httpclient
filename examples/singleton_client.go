@@ -1,7 +1,7 @@
 package examples
 
 import (
-	"github.com/aamir/httpclient/gohttp"
+	"github.com/aamirlatif1/httpclient/gohttp"
 	"time"
 )
 

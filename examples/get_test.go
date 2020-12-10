@@ -2,7 +2,7 @@ package examples
 
 import (
 	"errors"
-	"github.com/aamir/httpclient/gohttp"
+	"github.com/aamirlatif1/httpclient/gohttp"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"

@@ -1,4 +1,4 @@
-module github.com/aamir/httpclient
+module github.com/aamirlatif1/httpclient
 
 go 1.15
 
