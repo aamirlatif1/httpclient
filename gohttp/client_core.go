@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
+	"github.com/aamirlatif1/httpclient/mime"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -23,10 +25,10 @@ func (c *httpClient) getRequestBody(contentType string, body interface{}) ([]byt
 	}
 
 	switch strings.ToLower(contentType) {
-	case "application/json":
+	case mime.ContentTypeJson:
 		return json.Marshal(body)
 
-	case "application/xml":
+	case mime.ContentTypeXml:
 		return xml.Marshal(body)
 
 	default:
@@ -38,7 +40,7 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 
 	allHeaders := c.getRequestHeaders(headers)
 
-	requestBody, err := c.getRequestBody(allHeaders.Get("Content-Type"), body)
+	requestBody, err := c.getRequestBody(allHeaders.Get(mime.HeaderContentType), body)
 	if err != nil {
 		return nil, err
 	}
@@ -98,21 +100,24 @@ func (c *httpClient) getConnectionTimeout() time.Duration {
 	return defaultConnectionTimeout
 }
 
-func (c *httpClient) getRequestHeaders(headers http.Header) http.Header {
-	allHeaders := make(http.Header)
-
-	//Add common headers to request
-	for header, value := range c.builder.headers {
-		if len(value) > 0 {
-			allHeaders.Set(header, value[0])
+func (c *httpClient) getHttpClient() *http.Client {
+	c.clientOnce.Do(func() {
+		if c.builder.client != nil {
+			c.client = c.builder.client
+			return
 		}
-	}
-
-	//Add custom headers to the request
-	for header, value := range headers {
-		if len(value) > 0 {
-			allHeaders.Set(header, value[0])
+		c.client = &http.Client{
+			Timeout: c.getConnectionTimeout() + c.getResponseTimeout(),
+			Transport: &http.Transport{
+				MaxIdleConnsPerHost:   c.getMaxIdleConnections(),
+				ResponseHeaderTimeout: c.getResponseTimeout(),
+				DialContext: (&net.Dialer{
+					Timeout: c.getConnectionTimeout(),
+				}).DialContext,
+			},
 		}
-	}
-	return allHeaders
+	})
+
+	return c.client
 }
+
