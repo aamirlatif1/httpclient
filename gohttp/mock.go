@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 )
-
+//Mock is a structure where you can use to mock response of request.
 type Mock struct {
 	Method             string
 	Url                string

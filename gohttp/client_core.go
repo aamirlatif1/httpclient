@@ -5,9 +5,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"errors"
-	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -73,24 +71,6 @@ func (c *httpClient) do(method string, url string, headers http.Header, body int
 		body:       responseBody,
 	}
 	return &finalRes, nil
-}
-
-func (c *httpClient) getHttpClient() *http.Client {
-	c.clientOnce.Do(func() {
-		fmt.Println("================ Creating client ==================")
-		c.client = &http.Client{
-			Timeout: c.getConnectionTimeout() + c.getResponseTimeout(),
-			Transport: &http.Transport{
-				MaxIdleConnsPerHost:   c.getMaxIdleConnections(),
-				ResponseHeaderTimeout: c.getResponseTimeout(),
-				DialContext: (&net.Dialer{
-					Timeout: c.getConnectionTimeout(),
-				}).DialContext,
-			},
-		}
-	})
-
-	return c.client
 }
 
 func (c *httpClient) getMaxIdleConnections() int {

@@ -33,5 +33,5 @@ func (r *Response) String() string {
 }
 
 func (r *Response) UnmarshalJson(target interface{}) error {
-	return json.Unmarshal(r.Body(), target)
+	return json.Unmarshal(r.Body(), &target)
 }
